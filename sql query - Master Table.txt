@@ -1,0 +1,64 @@
+SELECT 
+	-- ids
+    o.order_id, 
+    c.customer_id,
+    p.product_id,
+    d.delivery_partner_id,
+    f.feedback_id,
+    
+    -- customers data
+    c.customer_name,
+    o.order_date as order_datetime,
+    c.area,
+    c.customer_segment,
+    
+    -- order_item data
+    oi.quantity,
+    
+    -- products data
+    p.product_name,
+    p.category,
+    p.price,
+    
+    -- Total price
+    ROUND(p.price*oi.quantity, 2) as Value,
+    
+    -- delivery data
+    d.delivery_time_minutes,
+    d.promised_time,
+    d.actual_time,
+    d.reasons_if_delayed,
+    
+    -- customer feedback
+    f.rating,
+    f.feedback_category,
+    f.sentiment,
+    f.feedback_text,
+
+    -- rating data
+    r.Emoji,
+    r.Star,
+    
+    -- category data
+    cat.Img,
+
+    DATE(o.order_date) as Date
+FROM
+    orders o,
+    customer c,
+    order_item oi,
+    products p,
+    customer_feedbacks f,
+    delivery d,
+    rating r,
+    category cat
+WHERE
+    o.customer_id = c.customer_id
+        AND o.order_id = ROUND(oi.order_id)
+        AND oi.product_id = ROUND(p.product_id)
+        AND o.customer_id = f.customer_id
+        AND o.order_id = f.order_id
+        AND d.order_id = o.order_id
+        AND d.delivery_partner_id = o.delivery_partner_id
+        AND f.rating = r.Rating
+        AND p.category = cat.category;
